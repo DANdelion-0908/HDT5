@@ -12,6 +12,6 @@ def newProcess():
     return att
 
 env = Environment()
+random.seed("equiposuperdupercool")
 
 Memory = makeRAM(env, 100, 100)
-
