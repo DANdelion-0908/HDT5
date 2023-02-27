@@ -76,21 +76,18 @@ def Pro_Gen(processes):
         env.process(queue(env, "Proceso %d" % i, lista[0], lista[1], ps, 3, Memory=Memory))
         yield env.timeout(random.expovariate(1.0/interval))
 
-processNum = [25]
+processNum = [25, 50, 100, 150, 200]
 finalTime = []
 
-for i in processNum:
+print(finalTime)
 
+for i in range(5):
+    env.process(Pro_Gen(processNum[i]))
+    env.run()
     finalTime.append(env.now)
-    print(finalTime)
+    print("\n")
 
-env.process(Pro_Gen(i))
-processNum.append(i)
-env.run()
 
-fig, ax = plt.subplots()
-ax.fill_between(finalTime, processNum)
-plt.show()
 
 # [Container].level | Regresa el valor
 # [Container].get(x) | Saca el valor de x
