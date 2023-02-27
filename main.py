@@ -87,7 +87,11 @@ for i in range(5):
     finalTime.append(env.now)
     print("\n")
 
-
+fig,ax = plt.subplots()
+print(finalTime)
+print(processNum)
+ax.fill_between(processNum, finalTime)
+plt.show()
 
 # [Container].level | Regresa el valor
 # [Container].get(x) | Saca el valor de x
