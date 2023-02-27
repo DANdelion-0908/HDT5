@@ -81,7 +81,7 @@ finalTime = []
 
 print(finalTime)
 
-for i in range(5):
+for i in range(len(processNum)):
     env.process(Pro_Gen(processNum[i]))
     env.run()
     finalTime.append(env.now)
