@@ -1,5 +1,6 @@
 from simpy import *
 import random
+import matplotlib.pyplot as plt
 
 RANDOM_SEED = 42
 
@@ -19,7 +20,7 @@ def queue(env, name, size, instructions, ps, proc_duration, Memory):
 
     RAM_Required = size
 
-    print("%s ha sido creado con %i instrucciones, un tamaño de %i y entra a la cola en el tiempo %d" % (name, instructions, size, env.now))
+    print("%s con %i instrucciones, un tamaño de %i entra a la cola en el tiempo %d" % (name, instructions, size, env.now))
 
     if Memory.level - RAM_Required < 0:
         print("No hay suficiente espacio de almacenamiento en la RAM")
@@ -48,8 +49,18 @@ def queue(env, name, size, instructions, ps, proc_duration, Memory):
                 print("%s saliendo de la CPU en el tiempo %d y se regresa a la cola" % (name, env.now))
                 ps.release(req)
                 yield Memory.put(size)
-                yield env.process(queue(env, name, size, instructions, ps, proc_duration, Memory))
-                yield env.timeout(random.expovariate(1.0/interval))
+
+                queueBack = random.randint(1, 2)
+
+                if queueBack == 1:
+                    yield env.process(queue(env, name, size, instructions, ps, proc_duration, Memory))
+                    yield env.timeout(random.expovariate(1.0/interval))
+
+                elif queueBack == 2:
+                    print("%s debe esperar 3 segundos para volver a la cola" % (name))
+                    yield env.timeout(proc_duration)
+                    yield env.process(queue(env, name, size, instructions, ps, proc_duration, Memory))
+                    yield env.timeout(random.expovariate(1.0/interval))
 
 #/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -59,15 +70,27 @@ Memory = makeRAM(env, 100, 100)
 ps = Resource(env, capacity=1)
 interval = 5
 
-def Pro_Gen():
-    for i in range(100000):
+def Pro_Gen(processes):
+    for i in range(processes):
         lista = newProcess()
         env.process(queue(env, "Proceso %d" % i, lista[0], lista[1], ps, 3, Memory=Memory))
         yield env.timeout(random.expovariate(1.0/interval))
 
-env.process(Pro_Gen())
+processNum = [25]
+finalTime = []
 
+for i in processNum:
+
+    finalTime.append(env.now)
+    print(finalTime)
+
+env.process(Pro_Gen(i))
+processNum.append(i)
 env.run()
+
+fig, ax = plt.subplots()
+ax.fill_between(finalTime, processNum)
+plt.show()
 
 # [Container].level | Regresa el valor
 # [Container].get(x) | Saca el valor de x
