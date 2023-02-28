@@ -6,6 +6,15 @@ import statistics
 RANDOM_SEED = 42
 START = []
 
+def DProceso():
+    duration = input("Unidades que desea para la duracion del proceso, deben ser valores enteros mayores o iguales que 1. (Recordatorio 1 unidad de tiempo = 3 procesos): ")
+    if(duration.isdigit() and int(duration)>= 1):
+        duration = int(duration) * 3
+        return duration
+    else:
+        print("Ingresa un número válido")
+    DProceso()
+    
 def makeRAM(env, init, cap):
     RAM = Container(env, init=init, capacity=cap)
     return RAM
@@ -67,9 +76,9 @@ def queue(env, name, size, instructions, ps, proc_duration, Memory):
 
 random.seed(RANDOM_SEED)
 env = Environment()
-Memory = makeRAM(env, 11, 11)
-ps = Resource(env, capacity=2)
-interval = 5
+Memory = makeRAM(env, 100, 100)
+ps = Resource(env, capacity=1)
+interval = 1
 
 def Pro_Gen(processes, duration):
     for i in range(processes):
@@ -82,15 +91,6 @@ finalTime = []
 
 print(finalTime)
 
-def DProceso():
-    duration = input("Unidades que desea para la duracion del proceso, deben ser valores enteros mayores o iguales que 1. (Recordatorio 1 unidad de tiempo = 3 procesos): ")
-    if(duration.isdigit() and int(duration)>= 1):
-        duration = int(duration) * 3
-        return duration
-    else:
-        print("A")
-    DProceso()
-
 duration = DProceso()
 
 for i in range(5):
@@ -99,6 +99,12 @@ for i in range(5):
     finalTime.append(env.now)
     print("\n")
 
+mean = statistics.mean(START)
+print("El promedio es: ", mean, "\n")
+
+desv = statistics.pstdev(START)
+print("La desviación estándar es: ", desv, "\n")
+
 fig,ax = plt.subplots()
 print(finalTime)
 print(processNum)
@@ -106,11 +112,6 @@ ax.fill_between(processNum, finalTime)
 #plt.title("Grafico Numero de procesos vs Tiempo de EJecucion")
 plt.show()
 
-mean = statistics.mean(START)
-print("El promedio es: ", mean)
-
-desv = statistics.pstdev(START)
-print("La desviación estándar es: ", desv)
 
 # [Container].level | Regresa el valor
 # [Container].get(x) | Saca el valor de x
