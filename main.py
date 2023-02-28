@@ -1,8 +1,10 @@
 from simpy import *
 import random
 import matplotlib.pyplot as plt
+import statistics
 
 RANDOM_SEED = 42
+START = []
 
 def makeRAM(env, init, cap):
     RAM = Container(env, init=init, capacity=cap)
@@ -18,11 +20,10 @@ def newProcess():
 
 def queue(env, name, size, instructions, ps, proc_duration, Memory):
 
-    RAM_Required = size
-
     print("%s con %i instrucciones, un tamaño de %i entra a la cola en el tiempo %d" % (name, instructions, size, env.now))
+    START.append(env.now)
 
-    if Memory.level - RAM_Required < 0:
+    if Memory.level - size < 0:
         print("No hay suficiente espacio de almacenamiento en la RAM")
         yield env.timeout(1)
 
@@ -57,7 +58,7 @@ def queue(env, name, size, instructions, ps, proc_duration, Memory):
                     yield env.timeout(random.expovariate(1.0/interval))
 
                 elif queueBack == 2:
-                    print("%s debe esperar 3 segundos para volver a la cola" % (name))
+                    print("%s debe esperar %i segundos para volver a la cola" % (name, proc_duration))
                     yield env.timeout(proc_duration)
                     yield env.process(queue(env, name, size, instructions, ps, proc_duration, Memory))
                     yield env.timeout(random.expovariate(1.0/interval))
@@ -66,8 +67,8 @@ def queue(env, name, size, instructions, ps, proc_duration, Memory):
 
 random.seed(RANDOM_SEED)
 env = Environment()
-Memory = makeRAM(env, 100, 100)
-ps = Resource(env, capacity=1)
+Memory = makeRAM(env, 11, 11)
+ps = Resource(env, capacity=2)
 interval = 5
 
 def Pro_Gen(processes, duration):
@@ -104,6 +105,12 @@ print(processNum)
 ax.fill_between(processNum, finalTime)
 #plt.title("Grafico Numero de procesos vs Tiempo de EJecucion")
 plt.show()
+
+mean = statistics.mean(START)
+print("El promedio es: ", mean)
+
+desv = statistics.pstdev(START)
+print("La desviación estándar es: ", desv)
 
 # [Container].level | Regresa el valor
 # [Container].get(x) | Saca el valor de x
